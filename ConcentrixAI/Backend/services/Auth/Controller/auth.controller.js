@@ -3,6 +3,7 @@ import { initializeApp, cert } from "firebase-admin/app";
 import serviceAccount from "../serviceAccountKey.json" assert { type: "json" };
 import crypto from "crypto";
 import User from "../model/user.model.js"; // adjust the path if needed
+import redis from "../../../shared/redis.js"; // adjust the path if needed
 
 initializeApp({
     credential: cert(serviceAccount),
@@ -31,6 +32,21 @@ export const login = async (req, res) => {
             console.log("User found or created:", user);
         }
 
+        await redis.set(
+            `session:${sessionId}`,
+            JSON.stringify(
+                {
+                    userid: user._id,
+                    email: user.email,
+                    name: user.name,
+                    avatar: user.avatar
+                }
+            ),
+            'EX',
+            60 * 60 * 24 * 7
+        ); 
+
+
         const sessionId = crypto.randomUUID();
 
         res.cookie("session", sessionId, {
@@ -50,3 +66,25 @@ export const login = async (req, res) => {
         });
     }
 };
+
+export const logout = async (req, res) => {
+    try {
+        const sessionId = req.cookies?.session;
+        await redis.del(`session:${sessionId}`);
+
+        res.clearCookie("session", {
+            httpOnly: true,
+            secure: false,
+            sameSite: "strict",
+        });
+
+        return res.status(200).json({
+            message: "Logout successful",
+        });
+        
+    }catch (error) {
+        return res.status(500).json({
+            error: error.message,
+        });
+    }
+}
