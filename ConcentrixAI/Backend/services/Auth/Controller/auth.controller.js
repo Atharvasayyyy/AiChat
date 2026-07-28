@@ -14,10 +14,20 @@ export const login = async (req, res) => {
         const { token } = req.body;
 
         const decoded = await getAuth().verifyIdToken(token);
-
+        console.log("Decoded token:", decoded);
+        console.log("UID:", decoded.uid);
         let user = await User.findOne({
             FirebaseUID: decoded.uid,
         });
+
+
+        console.log({
+  FirebaseUID: decoded.uid,
+  email: decoded.email,
+  name: decoded.name,
+  avatar: decoded.picture,
+});
+
 
         if (!user) {
             user = await User.create({
@@ -31,6 +41,9 @@ export const login = async (req, res) => {
         if (user) { 
             console.log("User found or created:", user);
         }
+
+        const sessionId = crypto.randomUUID();
+
 
         await redis.set(
             `session:${sessionId}`,
@@ -47,7 +60,6 @@ export const login = async (req, res) => {
         ); 
 
 
-        const sessionId = crypto.randomUUID();
 
         res.cookie("session", sessionId, {
             httpOnly: true,
