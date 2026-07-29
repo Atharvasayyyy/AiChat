@@ -7,6 +7,7 @@ import protect from "./middleware/auth.middleware.js";
 import { getcurrentuser } from "./controller/user.controller.js";
 
 dotenv.config();
+
 const app = express();
 app.use(cookieParser());
 

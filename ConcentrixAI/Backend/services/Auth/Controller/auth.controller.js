@@ -1,6 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
 import { initializeApp, cert } from "firebase-admin/app";
-import serviceAccount from "../serviceAccountKey.json" assert { type: "json" };
+import serviceAccount from "../serviceAccountKey.json" with { type: "json" };
 import crypto from "crypto";
 import User from "../model/user.model.js"; // adjust the path if needed
 import redis from "../../../shared/redis.js"; // adjust the path if needed
