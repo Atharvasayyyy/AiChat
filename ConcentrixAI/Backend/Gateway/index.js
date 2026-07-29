@@ -5,7 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import protect from "./middleware/auth.middleware.js";
 import { getcurrentuser } from "./controller/user.controller.js";
-
+import proxywithHeader from "./utils/proxyWithHeader.js"
 dotenv.config();
 
 const app = express();
@@ -17,6 +17,7 @@ app.use(cors({
 }));
 
 app.use("/api/auth", proxy(process.env.AUTH_SERVICE_URL));
+app.use("/api/chat", protect, proxywithHeader(process.env.CHAT_SERVICE_URL));
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
