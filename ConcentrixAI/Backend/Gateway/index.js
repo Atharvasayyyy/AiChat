@@ -18,6 +18,8 @@ app.use(cors({
 
 app.use("/api/auth", proxy(process.env.AUTH_SERVICE_URL));
 app.use("/api/chat", protect, proxywithHeader(process.env.CHAT_SERVICE_URL));
+app.use("/api/agents", protect, proxy(process.env.AGENTS_SERVICE_URL));
+
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
